@@ -31,7 +31,7 @@ while True:
     text = get_audio(False)
     if "wake up" in text:
         activeListen = True
-        speak("Hi Shanth, What can I help you with?")
+        speak("Hi Shanth, what can I help you with?")
         while activeListen:
             text = get_audio(True).strip()
             if any(x in text for x in ["what's the time", "what is the time"]):
@@ -74,4 +74,4 @@ while True:
             else:
                 speak("I'm sorry but I don't understand what you said")
                 continue
-            speak("Do you need anything else?")
+            speak("Anything else?")
