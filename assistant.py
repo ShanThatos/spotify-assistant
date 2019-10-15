@@ -1,5 +1,6 @@
 import os
 import time
+import random
 import speech_recognition as sr
 from datetime import datetime
 from playsound import playsound
@@ -54,6 +55,11 @@ def callback(rgn, audio):
             speak("Today's date is " + datetime.now().strftime("%A, %B %d %Y"))
             speak("Do you need anything else?")
             playsound("chime.wav")
+        elif "flip" in text and "coin" in text:
+            coin = random.randint(0, 1)
+            speak("Heads" if coin else "Tails")
+            speak("Do you need anything else?")
+            playsound("chime.wav")
         elif any(x in text.lower() for x in ["start spotify", "open spotify", "connect to spotify", "on spotify", "spotify"]):
             if not spt:
                 spt = SPT()
@@ -61,6 +67,7 @@ def callback(rgn, audio):
             speak("What would you like to do in Spotify?")
             playsound("chime.wav")
         elif any(x in text for x in ["no", "go to sleep", "goodbye"]) and any(x not in text for x in ["yes", "yeah"]):
+            current_state = "SLEEP"
             speak("Goodbye Shanth")
     elif current_state == "SPOTIFY":
         if "play" in text.lower():
