@@ -7,15 +7,17 @@ from gtts import gTTS
 from SPT import SPT
 
 def speak(text):
+    print(f":: {text}")
     tts = gTTS(text)
     tts.save("temp.mp3")
     playsound("temp.mp3")
     os.remove("temp.mp3")
 
 current_state = "SLEEP"
-sp = None
+spt = None
+# Recognizer functions and settings: https://github.com/Uberi/speech_recognition/blob/master/reference/library-reference.rst
 rgn = sr.Recognizer()
-rgn.energy_threshold = 3000
+rgn.energy_threshold = 2000
 rgn.dynamic_energy_threshold = True
 rgn.pause_threshold = .5
 mic = sr.Microphone()
@@ -26,8 +28,7 @@ with mic as source:
 
 def callback(rgn, audio):
     global current_state
-    global sp
-    global stop_listening
+    global spt
     text = ""
     try:
         text = rgn.recognize_google(audio)
@@ -54,8 +55,8 @@ def callback(rgn, audio):
             speak("Do you need anything else?")
             playsound("chime.wav")
         elif any(x in text.lower() for x in ["start spotify", "open spotify", "connect to spotify", "on spotify", "spotify"]):
-            if not sp:
-                sp = SPT()
+            if not spt:
+                spt = SPT()
             current_state = "SPOTIFY"
             speak("What would you like to do in Spotify?")
             playsound("chime.wav")
@@ -64,27 +65,27 @@ def callback(rgn, audio):
     elif current_state == "SPOTIFY":
         if "play" in text.lower():
             if not text.lower().replace("play", "").strip():
-                sp.resumeTrack()
+                spt.resumeTrack()
             for song_command in ["can you play the song", "can you play", "play the song", "play", "Play"]:
                 if song_command in text:
                     text = text.replace(song_command, "")
                     if " by " in text:
                         text = text.split(" by ")
-                        sp.playTrackByName(text[0], text[1])
+                        spt.playTrackByName(text[0], text[1])
                         text = ""
                     else:
-                        sp.playTrackByName(text, None)
+                        spt.playTrackByName(text, None)
                     break
         if "resume" in text.lower():
-            sp.resumeTrack()
+            spt.resumeTrack()
         if "pause" in text.lower():
-            sp.pauseTrack()
+            spt.pauseTrack()
         if "restart" in text.lower():
-            sp.seekToPosition(0)
-            sp.resumeTrack()
+            spt.seekToPosition(0)
+            spt.resumeTrack()
         if "volume" in text.lower():
             newVolume = 100 if any(x in text.lower() for x in ["full", "max", "100", "hundred"]) else 0 if any(x in text.lower() for x in ["min", "zero", " 0 "]) else 50 if any(x in text.lower() for x in ["half", "fifty", "50"]) else 0
-            sp.changeVolume(newVolume)
+            spt.changeVolume(newVolume)
         if any(x in text.lower() for x in ["exit spotify", "stop spotify"]):
             current_state = "ACTIVE"
 
